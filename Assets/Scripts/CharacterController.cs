@@ -39,7 +39,7 @@ public class CharacterController : MonoBehaviour
         }
         else if(gameMode == 1)
         {
-
+            Fly();
         }
     }
 
@@ -63,6 +63,19 @@ public class CharacterController : MonoBehaviour
         {
             //Karakterimiz yere degmedigi muddetce, karakterimizin donmesini saglıyorum.
             transform.Rotate(Vector3.back * rotateSpeed);
+        }
+    }
+
+    void Fly()
+    {
+        transform.rotation = Quaternion.Euler(0, 0, myRigidbody.velocity.y * 2);
+        if (Input.GetMouseButton(0)) 
+        {
+            myRigidbody.gravityScale = -gravityScale[gameMode];
+        }
+        else 
+        {
+            myRigidbody.gravityScale = gravityScale[gameMode];
         }
     }
 }
