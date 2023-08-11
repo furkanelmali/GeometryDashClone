@@ -9,8 +9,11 @@ public class CharacterController : MonoBehaviour
 {
     Collider2D CubeCollider;
     Rigidbody2D myRigidbody;
+    UIManager manager;
+    GeneralCharacterFeatures gcFeatures;
 
     public int gameMode;
+    public bool characterLives;
 
     [SerializeField] float[] speed;
     [SerializeField] float[] gravityScale;
@@ -22,26 +25,31 @@ public class CharacterController : MonoBehaviour
     {
         CubeCollider = GetComponent<BoxCollider2D>();
         myRigidbody = GetComponent<Rigidbody2D>();
+        gcFeatures = GetComponent<GeneralCharacterFeatures>();
+        manager = FindObjectOfType<UIManager>();
     }
 
    
     void Update()
     {
         //Burada rigidbody fiziklerinden etkilenmeyecek bir sekilde, karakterin sürekli olarak saga belirli bir hızda hareket etmesini saglıyorum.
-        transform.position += Vector3.right * speed[gameMode] * Time.deltaTime;
-        myRigidbody.gravityScale = gravityScale[gameMode];
+        SpeedandGravity();
         CubeJumpandFly();
     }
 
     private void CubeJumpandFly()
     {
-        if (gameMode == 0)
-        { 
-            Jump();
-        }
-        else if(gameMode == 1)
+        //Oyun main menu arayuzundeyken, timescale'imiz 0 olduğu icin Layer teması belirlenemiyor, bu da karakterimizin main menude sonsuz bir rotate almasına sebep oluyordu. GameRun boolu ile bunun onune gectim.
+        if (manager.GameRun) 
         {
-            Fly();
+            if (gameMode == 0)
+            {
+                Jump();
+            }
+            else if (gameMode == 1)
+            {
+                Fly();
+            }
         }
     }
 
@@ -59,6 +67,7 @@ public class CharacterController : MonoBehaviour
             {
                 myRigidbody.velocity = Vector3.zero;
                 myRigidbody.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+                gcFeatures.JumpEffects();
             }
         }
         else if (!CubeCollider.IsTouchingLayers(LayerMask.GetMask("Platform")))
@@ -74,9 +83,19 @@ public class CharacterController : MonoBehaviour
         if (Input.GetMouseButton(0)) 
         {
             myRigidbody.gravityScale = -gravityScale[gameMode];
+            gcFeatures.RocketEffects();
         }
         else 
         {
+            myRigidbody.gravityScale = gravityScale[gameMode];
+        }
+    }
+
+    void SpeedandGravity() 
+    {
+        if (characterLives)
+        {
+            transform.position += Vector3.right * speed[gameMode] * Time.deltaTime;
             myRigidbody.gravityScale = gravityScale[gameMode];
         }
     }
