@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net.Sockets;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 
 public class CharacterController : MonoBehaviour
@@ -28,6 +29,7 @@ public class CharacterController : MonoBehaviour
     {
         //Burada rigidbody fiziklerinden etkilenmeyecek bir sekilde, karakterin sürekli olarak saga belirli bir hızda hareket etmesini saglıyorum.
         transform.position += Vector3.right * speed[gameMode] * Time.deltaTime;
+        myRigidbody.gravityScale = gravityScale[gameMode];
         CubeJumpandFly();
     }
 
@@ -78,4 +80,6 @@ public class CharacterController : MonoBehaviour
             myRigidbody.gravityScale = gravityScale[gameMode];
         }
     }
+
+  
 }

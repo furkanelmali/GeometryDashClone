@@ -15,8 +15,6 @@ public class Portal : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        Debug.Log("Object in");
-
         if (collision.gameObject.tag == "Player")
             controller.gameMode = (controller.gameMode == 0) ? 1 : 0;
     }
