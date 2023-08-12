@@ -8,12 +8,10 @@ public class UIManager : MonoBehaviour
     public bool GameRun;
     public bool SoundCheck;
 
-
     [SerializeField] Sprite[] soundSprites;
     [SerializeField] Image soundImage;
 
     public AudioListener soundListener;
-    
 
     void Start()
     {
@@ -21,7 +19,6 @@ public class UIManager : MonoBehaviour
         GameRun = false;
         
     }
-
     
     void Update()
     {
@@ -40,8 +37,6 @@ public class UIManager : MonoBehaviour
         }
     }
 
- 
-
     public void PlayBtn() 
     {
         GameRun = true;
@@ -54,7 +49,6 @@ public class UIManager : MonoBehaviour
             SoundCheck = false;
             soundImage.sprite = soundSprites[0];
             soundListener.enabled = false;
-            
         }
         else 
         {

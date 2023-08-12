@@ -7,23 +7,24 @@ using UnityEngine.UIElements;
 
 public class CharacterController : MonoBehaviour
 {
-    Collider2D CubeCollider;
+    
     Rigidbody2D myRigidbody;
     UIManager manager;
     GeneralCharacterFeatures gcFeatures;
 
-    public int gameMode;
+    
+    public GameMode gameMode;
     public bool characterLives;
 
     [SerializeField] float[] speed;
     [SerializeField] float[] gravityScale;
     [SerializeField] float rotateSpeed;
     [SerializeField] float jumpForce;
-    
+    [SerializeField] Collider2D[] CharactersColliders;
+
 
     void Start()
     {
-        CubeCollider = GetComponent<BoxCollider2D>();
         myRigidbody = GetComponent<Rigidbody2D>();
         gcFeatures = GetComponent<GeneralCharacterFeatures>();
         manager = FindObjectOfType<UIManager>();
@@ -35,6 +36,7 @@ public class CharacterController : MonoBehaviour
         //Burada rigidbody fiziklerinden etkilenmeyecek bir sekilde, karakterin sürekli olarak saga belirli bir hızda hareket etmesini saglıyorum.
         SpeedandGravity();
         CubeJumpandFly();
+        gcFeatures.ChangeCharacter(gameMode);
     }
 
     private void CubeJumpandFly()
@@ -42,11 +44,11 @@ public class CharacterController : MonoBehaviour
         //Oyun main menu arayuzundeyken, timescale'imiz 0 olduğu icin Layer teması belirlenemiyor, bu da karakterimizin main menude sonsuz bir rotate almasına sebep oluyordu. GameRun boolu ile bunun onune gectim.
         if (manager.GameRun) 
         {
-            if (gameMode == 0)
+            if (gameMode == GameMode.Cube)
             {
                 Jump();
             }
-            else if (gameMode == 1)
+            else if (gameMode == GameMode.Rocket)
             {
                 Fly();
             }
@@ -56,12 +58,13 @@ public class CharacterController : MonoBehaviour
     void Jump() 
     {
         //karakterimizin platform layerımıza degip degmedigini kontrol ettiriyorum.
-        if (CubeCollider.IsTouchingLayers(LayerMask.GetMask("Platform")))
+        if (CharactersColliders[(int)gameMode].IsTouchingLayers(LayerMask.GetMask("Platform")))
         {
             //karakterimizin, yere capraz inmesini onlemek adına eger yere degiyorsa, rotation z eksenini en yakin 90 katsayisina yuvarliyorum.
             Vector3 Rotation = transform.rotation.eulerAngles;
             Rotation.z = Mathf.Round(Rotation.z / 90) * 90;
             transform.rotation = Quaternion.Euler(Rotation);
+            
 
             if (Input.GetMouseButton(0))
             {
@@ -70,10 +73,11 @@ public class CharacterController : MonoBehaviour
                 gcFeatures.JumpEffects();
             }
         }
-        else if (!CubeCollider.IsTouchingLayers(LayerMask.GetMask("Platform")))
+        else if (!CharactersColliders[(int)gameMode].IsTouchingLayers(LayerMask.GetMask("Platform")))
         {
             //Karakterimiz yere degmedigi muddetce, karakterimizin donmesini saglıyorum.
             transform.Rotate(Vector3.back * rotateSpeed);
+            
         }
     }
 
@@ -82,12 +86,20 @@ public class CharacterController : MonoBehaviour
         transform.rotation = Quaternion.Euler(0, 0, myRigidbody.velocity.y * 2);
         if (Input.GetMouseButton(0)) 
         {
-            myRigidbody.gravityScale = -gravityScale[gameMode];
+            if (!gcFeatures.Blast.isPlaying)
+            {
+                gcFeatures.Blast.Play();
+            }
+            myRigidbody.gravityScale = -gravityScale[(int)gameMode];
             gcFeatures.RocketEffects();
         }
         else 
         {
-            myRigidbody.gravityScale = gravityScale[gameMode];
+            if(gcFeatures.Blast.isPlaying)
+            {
+                gcFeatures.Blast.Stop(); 
+            }
+            myRigidbody.gravityScale = gravityScale[(int)gameMode];
         }
     }
 
@@ -95,8 +107,8 @@ public class CharacterController : MonoBehaviour
     {
         if (characterLives)
         {
-            transform.position += Vector3.right * speed[gameMode] * Time.deltaTime;
-            myRigidbody.gravityScale = gravityScale[gameMode];
+            transform.position += Vector3.right * speed[(int)gameMode] * Time.deltaTime;
+            myRigidbody.gravityScale = gravityScale[(int)gameMode];
         }
     }
 

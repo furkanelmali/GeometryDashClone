@@ -14,8 +14,6 @@ public class Finish : MonoBehaviour
         audioSource = GetComponent<AudioSource>();
     }
 
-
-
     private void OnCollisionEnter2D(Collision2D collision)
     {
         gcFeatures.Finish(audioSource);
